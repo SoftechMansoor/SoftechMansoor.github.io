@@ -1,163 +1,284 @@
-jQuery(function($) {
+jQuery(document).ready(function($) {
 
-	//Preloader
-	var preloader = $('.preloader');
-	$(window).load(function(){
-		preloader.remove();
-	});
+  'use strict';
 
-	//#main-slider
-	var slideHeight = $(window).height();
-	$('#home-slider .item').css('height',slideHeight);
+      (function($) {
+        $(".accordion > li:eq(0) a")
+          .addClass("active")
+          .next()
+          .slideDown();
 
-	$(window).resize(function(){'use strict',
-		$('#home-slider .item').css('height',slideHeight);
-	});
-	
-	//Scroll Menu
-	$(window).on('scroll', function(){
-		if( $(window).scrollTop()>slideHeight ){
-			$('.main-nav').addClass('navbar-fixed-top');
-		} else {
-			$('.main-nav').removeClass('navbar-fixed-top');
-		}
-	});
-	
-	// Navigation Scroll
-	$(window).scroll(function(event) {
-		Scroll();
-	});
+        $(".accordion a").click(function(j) {
+          var dropDown = $(this)
+            .closest("li")
+            .find("p");
 
-	$('.navbar-collapse ul li a').on('click', function() {  
-		$('html, body').animate({scrollTop: $(this.hash).offset().top - 5}, 1000);
-		return false;
-	});
+          $(this)
+            .closest(".accordion")
+            .find("p")
+            .not(dropDown)
+            .slideUp();
 
-	// User define function
-	function Scroll() {
-		var contentTop      =   [];
-		var contentBottom   =   [];
-		var winTop      =   $(window).scrollTop();
-		var rangeTop    =   200;
-		var rangeBottom =   500;
-		$('.navbar-collapse').find('.scroll a').each(function(){
-			contentTop.push( $( $(this).attr('href') ).offset().top);
-			contentBottom.push( $( $(this).attr('href') ).offset().top + $( $(this).attr('href') ).height() );
-		})
-		$.each( contentTop, function(i){
-			if ( winTop > contentTop[i] - rangeTop ){
-				$('.navbar-collapse li.scroll')
-				.removeClass('active')
-				.eq(i).addClass('active');			
-			}
-		})
-	};
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active");
+          } else {
+            $(this)
+              .closest(".accordion")
+              .find("a.active")
+              .removeClass("active");
+            $(this).addClass("active");
+          }
 
-	$('#tohash').on('click', function(){
-		$('html, body').animate({scrollTop: $(this.hash).offset().top - 5}, 1000);
-		return false;
-	});
-	
-	//Initiat WOW JS
-	new WOW().init();
-	//smoothScroll
-	smoothScroll.init();
-	
-	// Progress Bar
-	$('#about-us').bind('inview', function(event, visible, visiblePartX, visiblePartY) {
-		if (visible) {
-			$.each($('div.progress-bar'),function(){
-				$(this).css('width', $(this).attr('aria-valuetransitiongoal')+'%');
-			});
-			$(this).unbind('inview');
-		}
-	});
+          dropDown.stop(false, true).slideToggle();
 
-	//Countdown
-	$('#features').bind('inview', function(event, visible, visiblePartX, visiblePartY) {
-		if (visible) {
-			$(this).find('.timer').each(function () {
-				var $this = $(this);
-				$({ Counter: 0 }).animate({ Counter: $this.text() }, {
-					duration: 2000,
-					easing: 'swing',
-					step: function () {
-						$this.text(Math.ceil(this.Counter));
-					}
-				});
-			});
-			$(this).unbind('inview');
-		}
-	});
+          j.preventDefault();
+        });
+      })(jQuery);
 
-	// Portfolio Single View
-	$('#portfolio').on('click','.folio-read-more',function(event){
-		event.preventDefault();
-		var link = $(this).data('single_url');
-		var full_url = '#portfolio-single-wrap',
-		parts = full_url.split("#"),
-		trgt = parts[1],
-		target_top = $("#"+trgt).offset().top;
 
-		$('html, body').animate({scrollTop:target_top}, 600);
-		$('#portfolio-single').slideUp(500, function(){
-			$(this).load(link,function(){
-				$(this).slideDown(500);
-			});
-		});
-	});
 
-	// Close Portfolio Single View
-	$('#portfolio-single-wrap').on('click', '.close-folio-item',function(event) {
-		event.preventDefault();
-		var full_url = '#portfolio',
-		parts = full_url.split("#"),
-		trgt = parts[1],
-		target_offset = $("#"+trgt).offset(),
-		target_top = target_offset.top;
-		$('html, body').animate({scrollTop:target_top}, 600);
-		$("#portfolio-single").slideUp(500);
-	});
+      $('.owl-carousel').owlCarousel({
+          loop:true,
+          margin:30,
+          responsiveClass:true,
+          responsive:{
+              0:{
+                  items:1,
+                  nav:true
+              },
+              500:{
+                  items:1,
+                  nav:false
+              },
+              800:{
+                  items:1,
+                  nav:false
+              },
+              1000:{
+                  items:1,
+                  nav:true,
+                  loop:false
+              },
+              1200:{
+                  items:1,
+                  nav:true,
+                  loop:false
+              },
+              1500:{
+                  items:1,
+                  nav:true,
+                  loop:false
+              }
+          }
+      })
 
-	// Contact form
-	var form = $('#main-contact-form');
-	form.submit(function(event){
-		event.preventDefault();
-		var form_status = $('<div class="form_status"></div>');
-		$.ajax({
-			url: $(this).attr('action'),
-			beforeSend: function(){
-				form.prepend( form_status.html('<p><i class="fa fa-spinner fa-spin"></i> Email is sending...</p>').fadeIn() );
-			}
-		}).done(function(data){
-			form_status.html('<p class="text-success">Thank you for contact us. As early as possible  we will contact you</p>').delay(3000).fadeOut();
-		});
-	});
+      
+      $('#form-submit .date').datepicker({
+      });
 
-	//Google Map
-	var latitude = $('#google-map').data('latitude')
-	var longitude = $('#google-map').data('longitude')
-	function initialize_map() {
-		var myLatlng = new google.maps.LatLng(latitude,longitude);
-		var mapOptions = {
-			zoom: 14,
-			scrollwheel: false,
-			center: myLatlng
-		};
-		var map = new google.maps.Map(document.getElementById('google-map'), mapOptions);
-		var contentString = '';
-		var infowindow = new google.maps.InfoWindow({
-			content: '<div class="map-content"><ul class="address">' + $('.address').html() + '</ul></div>'
-		});
-		var marker = new google.maps.Marker({
-			position: myLatlng,
-			map: map
-		});
-		google.maps.event.addListener(marker, 'click', function() {
-			infowindow.open(map,marker);
-		});
-	}
-	google.maps.event.addDomListener(window, 'load', initialize_map);
-	
+      /**
+     * jquery.responsive-menu.js
+     * jQuery + CSS Multi Level Responsive Menu
+     */
+
+    jQuery(function($) {
+      $.fn.responsivenav = function(args) {
+        // Default settings
+        var defaults = {
+          responsive: true,
+          width: 993,                           // Responsive width
+          button: $(this).attr('id')+'-button', // Menu button id
+          animation: {                          // Menu animation
+          effect: 'slide',                    // Accepts 'slide' or 'fade'
+          show: 150,
+          hide: 100
+          },
+          selected: 'selected',                 // Selected class
+          arrow: 'downarrow'                    // Dropdown arrow class
+        };
+        var settings = $.extend(defaults, args);
+        
+        // Initialize the menu and the button
+        init($(this).attr('id'), settings.button);
+        
+        function init(menuid, buttonid) {
+          setupMenu(menuid, buttonid);
+          // Add a handler function for the resize and orientationchange event
+          $(window).bind('resize orientationchange', function(){ resizeMenu(menuid, buttonid); });
+          // Trigger initial resize
+          resizeMenu(menuid, buttonid);
+        }
+        
+        function setupMenu(menuid, buttonid) {
+          var $mainmenu = $('#'+menuid+'>ul');
+          
+          var $headers = $mainmenu.find("ul").parent();
+          // Add dropdown arrows
+          $headers.each(function(i) {
+            var $curobj = $(this);
+            $curobj.children('a:eq(0)').append('<span class="'+settings.arrow+'"></span>');
+          });
+          
+          if ( settings.responsive ) {
+            // Menu button click event
+            // Displays top-level menu items
+            $('#'+buttonid).click(function(e) {
+              e.preventDefault();
+              
+              if ( isSelected($('#'+buttonid)) ) {
+                // Close menu
+                collapseChildren('#'+menuid);
+                animateHide($('#'+menuid), $('#'+buttonid));
+              } else {
+                // Open menu
+                animateShow($('#'+menuid), $('#'+buttonid));
+              }
+            });
+          }
+        }
+        
+        function resizeMenu(menuid, buttonid) {
+          var $ww = document.body.clientWidth;
+          
+          // Add mobile class to elements for CSS use
+          // instead of relying on media-query support
+          if ( $ww > settings.width || !settings.responsive) {
+            $('#'+menuid).removeClass('mobile');
+            $('#'+buttonid).removeClass('mobile');
+          } else {
+            $('#'+menuid).addClass('mobile');
+            $('#'+buttonid).addClass('mobile');
+          }
+          
+          var $headers = $('#'+menuid+'>ul').find('ul').parent();
+          
+          $headers.each(function(i) {
+            var $curobj = $(this);
+            var $link = $curobj.children('a:eq(0)');
+            var $subul = $curobj.find('ul:eq(0)');
+            
+            // Unbind events
+            $curobj.unbind('mouseenter mouseleave');
+            $link.unbind('click');
+            animateHide($curobj.children('ul:eq(0)'));
+            
+            if ( $ww > settings.width  || !settings.responsive ) {
+              // Full menu
+              $curobj.hover(function(e) {
+                var $targetul = $(this).children('ul:eq(0)');
+                
+                var $dims = { w: this.offsetWidth,
+                              h: this.offsetHeight,
+                              subulw: $subul.outerWidth(),
+                              subulh: $subul.outerHeight()
+                            };
+                var $istopheader = $curobj.parents('ul').length == 1 ? true : false;
+                $subul.css($istopheader ? {} : { top: 0 });
+                var $offsets = { left: $(this).offset().left, 
+                                 top: $(this).offset().top
+                               };
+                var $menuleft = $istopheader ? 0 : $dims.w;
+                $menuleft = ( $offsets.left + $menuleft + $dims.subulw > $(window).width() ) ? ( $istopheader ? -$dims.subulw + $dims.w : -$dims.w ) : $menuleft;
+                $targetul.css({ left:$menuleft+'px', 
+                               width:$dims.subulw+'px' 
+                              });
+                
+                animateShow($targetul);
+              },
+              function(e) {
+                var $targetul = $(this).children('ul:eq(0)');
+                animateHide($targetul);
+              });
+            } else {
+              // Compact menu
+              $link.click(function(e) {
+                e.preventDefault();
+
+                var $targetul = $curobj.children('ul:eq(0)');
+                if ( isSelected($curobj) ) {
+                  collapseChildren($targetul);
+                  animateHide($targetul);
+                } else {
+                  //collapseSiblings($curobj);
+                  animateShow($targetul);
+                }
+              });
+            }
+          });
+          
+          collapseChildren('#'+menuid);
+          
+          if ( settings.responsive && isSelected($('#'+buttonid)) ) {
+            //collapseChildren('#'+menuid);
+            $('#'+menuid).hide();
+            $('#'+menuid).removeAttr('style');
+            $('#'+buttonid).removeClass(settings.selected);
+          }
+        }
+        
+        function collapseChildren(elementid) {
+          // Closes all submenus of the specified element
+          var $headers = $(elementid).find('ul');
+          $headers.each(function(i) {
+            if ( isSelected($(this).parent()) ) {
+              animateHide($(this));
+            }
+          });
+        }
+        
+        function collapseSiblings(element) {
+          var $siblings = element.siblings('li');
+          $siblings.each(function(i) {
+            collapseChildren($(this));
+          });
+        }
+        
+        function isSelected(element) {
+          return element.hasClass(settings.selected);
+        }
+        
+        function animateShow(menu, button) {
+          if ( !button ) { var button = menu.parent(); }
+          
+          button.addClass(settings.selected);
+          
+          if ( settings.animation.effect == 'fade' ) {
+            menu.fadeIn(settings.animation.show);
+          } else if ( settings.animation.effect == 'slide' ) {
+            menu.slideDown(settings.animation.show);
+          } else {
+            menu.show();
+            menu.removeClass('hide');
+          }
+        }
+        
+        function animateHide(menu, button) {
+          if ( !button ) { var button = menu.parent(); }
+          
+          if ( settings.animation.effect == 'fade' ) {
+            menu.fadeOut(settings.animation.hide, function() { 
+              menu.removeAttr('style');
+              button.removeClass(settings.selected);
+            });
+          } else if ( settings.animation.effect == 'slide' ) {
+            menu.slideUp(settings.animation.hide, function() { 
+              menu.removeAttr('style');
+              button.removeClass(settings.selected);
+            });
+          } else {
+            menu.hide();
+            menu.addClass('hide');
+            menu.removeAttr('style');
+            button.removeClass(settings.selected);
+          }
+        }
+      };
+    });
+
+    jQuery(function ($) {
+      $('#primary-nav').responsivenav();
+      $('#top-nav').responsivenav({responsive:false});
+    });
+
+
 });
-
